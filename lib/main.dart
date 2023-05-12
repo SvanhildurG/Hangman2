@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -30,17 +32,53 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  void _incrementCounter() {
+  List<String> words = [
+    'lluvia',
+    'viento',
+    'humedad',
+    'calor',
+    'frío',
+    'niebla',
+    'nieve',
+    'sol',
+    'nube'
+  ];
+  String randomWord = '';
+  //List<String> _guessedLetters = []; //Already defined
+  int _wrongGuesses = 0; //Not using
+  List<String> _underscore = [];
+
+  void wrongGuesses() {
+    //Try to use counter with images, have set state (Gunnar) and counter but haven't got it to work
+    //void because setState - from error message
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
+      _wrongGuesses++;
     });
   }
 
   @override
+  void initState() {
+    //Object is inserted to a tree - can not set _randomWord above
+    super.initState();
+    randomWord = words.elementAt(Random().nextInt(words.length));
+    _underscore = List.generate(randomWord.length, (_) => '_');
+  } //Display of underscores but beneath the image and very small - try and fix that next
+
+  void _guessedLetters(String letter) {
+    bool letterFound = false;
+    setState(() {
+      for (var i = 0; i < randomWord.length; i++) {
+        if (randomWord[i] == letter) {
+          _underscore[i] = letter;
+          letterFound = true;
+        }
+      }
+      if (!letterFound) {
+        wrongGuesses();
+      }
+    });
+  }
+
   Widget build(BuildContext context) {
     //method reruns every time setState is called
     return Scaffold(
@@ -54,22 +92,29 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Image.asset(
               'assets/images/1.png',
+              //'assets/image$_wrongGuesses.png', //Use setState - must be above the widget tree
               height: 200,
+              width: 200,
             ),
+            Text(_underscore.join('_')),
+
+            //set state: setState(() { _myState = newValue; });
+
             //ElevatedButton(
             //child: Text(
-            //skoða hér að setja ekki elevated heldur bara nýtt widget með strikunum
+            //skoða að setja ekki elevated heldur bara setja underscore fyrir ofan myndina
             //),
-
             //),
           ],
         ),
       ),
-      //floatingActionButton: FloatingActionButton(
-      //onPressed: _incrementCounter,
-      //tooltip: 'Increment',
-      //child: const Icon(Icons.add),
-      //), //This trailing comma makes auto-formatting nicer for build methods.
     );
+
+    //floatingActionButton: FloatingActionButton(
+    //onPressed: _incrementCounter,
+    //tooltip: 'Increment',
+    //child: const Icon(Icons.add),
+    // function to handle wrong guesses
+    //This trailing comma makes auto-formatting nicer for build methods.
   }
 }
