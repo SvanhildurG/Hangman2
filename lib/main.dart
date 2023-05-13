@@ -46,7 +46,10 @@ class _MyHomePageState extends State<MyHomePage> {
   String randomWord = '';
   //List<String> _guessedLetters = []; //Already defined
   int _wrongGuesses = 0; //Not using
-  List<String> _underscore = [];
+  List<String> letterInput = [];
+  List<String> underscore = [];
+  List<String> images = [];
+  final _textController = TextEditingController();
 
   void wrongGuesses() {
     //Try to use counter with images, have set state (Gunnar) and counter but haven't got it to work
@@ -57,19 +60,20 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  //Call initState method to initialize randomWord and underscore
+  //Within void - don't return value
   void initState() {
-    //Object is inserted to a tree - can not set _randomWord above
     super.initState();
     randomWord = words.elementAt(Random().nextInt(words.length));
-    _underscore = List.generate(randomWord.length, (_) => '_');
-  } //Display of underscores but beneath the image and very small - try and fix that next
+    underscore = List.generate(randomWord.length, (_) => '_');
+  }
 
   void _guessedLetters(String letter) {
     bool letterFound = false;
     setState(() {
       for (var i = 0; i < randomWord.length; i++) {
         if (randomWord[i] == letter) {
-          _underscore[i] = letter;
+          underscore[i] = letter;
           letterFound = true;
         }
       }
@@ -85,36 +89,62 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Colors.pinkAccent,
         title: Text(widget.title),
+        centerTitle: true,
       ),
-      body: Center(
+      body: Container(
+        margin: const EdgeInsets.only(top: 2),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Center(
+              child: Stack(
+                //Trying Stack
+                children: [],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              underscore.join(' '),
+              style: const TextStyle(
+                fontSize: 100,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 20),
             Image.asset(
+              //Try later!!!
               'assets/images/1.png',
               //'assets/image$_wrongGuesses.png', //Use setState - must be above the widget tree
               height: 200,
               width: 200,
             ),
-            Text(_underscore.join('_')),
-
-            //set state: setState(() { _myState = newValue; });
-
-            //ElevatedButton(
-            //child: Text(
-            //skoða að setja ekki elevated heldur bara setja underscore fyrir ofan myndina
-            //),
-            //),
+            const SizedBox(height: 60),
+            TextField(
+              controller: _textController,
+              decoration: InputDecoration(
+                hintText: '¡Entra tu letra!',
+                hintStyle: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                  color: Colors.pinkAccent,
+                ),
+                border: const OutlineInputBorder(),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    //Clear what's currently in the textfield
+                    _textController.clear();
+                  },
+                  icon: const Icon(Icons.keyboard),
+                ),
+              ),
+            )
           ],
         ),
       ),
+      //floatingActionButton: FloatingActionButton(
+      //onPressed: (); //Trying keyboard, need set state? and define, maybe comes by itself on Android?: https://www.youtube.com/watch?v=LFQgZc4oKa4
+      //child: const Icon(Icons.keyboard),
+      //), // This trailing comma makes auto-formatting nicer for build methods.
     );
-
-    //floatingActionButton: FloatingActionButton(
-    //onPressed: _incrementCounter,
-    //tooltip: 'Increment',
-    //child: const Icon(Icons.add),
-    // function to handle wrong guesses
-    //This trailing comma makes auto-formatting nicer for build methods.
   }
 }
