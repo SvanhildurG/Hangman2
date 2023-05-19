@@ -7,7 +7,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key); //from tic tac toe
 
   // Root of application.
   @override
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHangMan extends StatefulWidget {
-  const MyHangMan({super.key, required this.title}); //Homepage
+  const MyHangMan({Key? key, required this.title}) : super(key: key); //Homepage
 
   final String title;
 
@@ -43,17 +43,9 @@ class _MyHangManState extends State<MyHangMan> {
     'sol',
     'nube'
   ];
-//From tic tac toe - trying to reset game with elevated button
-  //Error: Classes can't be declared inside other classes!!!! - look at next!!!! - Above class _MyHangmanState?
-  class _GameScreen extends State<MyHangMan> {
-  Game game = Game();
-
-  }
 
   String randomWord = '';
-  //List<String> _guessedLetters = []; //Already defined
-  int _wrongGuesses = 0; //Not using
-  //List<String> letterInput = []; //Ath!!!
+  int _wrongGuesses = 0;
   List<String> underscore = [];
   List<String> images = [
     '1.png',
@@ -66,6 +58,7 @@ class _MyHangManState extends State<MyHangMan> {
   ];
 
   final _textController = TextEditingController(); //Takes input from keyboard
+  List<String> guessedLetters = [];
 
   //Increase/show images one by one if user guesses wrong letter
   void wrongGuesses() {
@@ -86,20 +79,32 @@ class _MyHangManState extends State<MyHangMan> {
       }
       if (!letterFound) {
         wrongGuesses();
+        guessedLetters.add(letter); //Wrong letter to list
       }
       _textController.clear();
     });
   }
 
+  //Stop game
+
+  // Restart the game
+  void reStart() {
+    setState(() {
+      _wrongGuesses = 0;
+      randomWord = words.elementAt(Random().nextInt(words.length));
+      underscore = List.generate(randomWord.length, (_) => '_');
+      guessedLetters.clear();
+    });
+  }
+
   @override
-  //Call initState method to initialize randomWord and underscore
-  //Within void - don't return value
   void initState() {
     super.initState();
     randomWord = words.elementAt(Random().nextInt(words.length));
     underscore = List.generate(randomWord.length, (_) => '_');
   }
 
+  @override
   Widget build(BuildContext context) {
     //method reruns every time setState is called
     return Scaffold(
@@ -109,27 +114,39 @@ class _MyHangManState extends State<MyHangMan> {
         centerTitle: true,
       ),
       body: Container(
-        margin: const EdgeInsets.only(top: 2),
+        margin: const EdgeInsets.only(top: 0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            //Display of images after each wrong guess
             const SizedBox(height: 16),
-            //Display of images after each wrong guess, using map
             Image.asset(
-              'assets/images/${images[_wrongGuesses]}', //Works but get error message after 7 images - look at next
+              'assets/images/${images[_wrongGuesses]}',
               height: 200,
               width: 200,
             ),
+            //Display of underscores
             const SizedBox(height: 16),
             Text(
               underscore.join(' '),
               style: const TextStyle(
-                fontSize: 100,
+                fontSize: 75,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 30),
-            //User can input a letter by tapping on instructions, introducing the letter in the box and press enter
+            //Display of incorrect letters
+            const SizedBox(height: 20),
+            Text(
+              'Incorrecto: ${guessedLetters.join(' - ')}',
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+                color: Colors.pink,
+                fontSize: 25,
+              ),
+            ),
+            //Input from user from keyboard
+            const SizedBox(height: 16),
             TextField(
               controller: _textController,
               onSubmitted: checkLetter,
@@ -143,24 +160,24 @@ class _MyHangManState extends State<MyHangMan> {
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
                   onPressed: () {
-                    //Clear what's currently in the textfield
+                    //Clear the textfield
                     _textController.clear();
                   },
                   icon: const Icon(Icons.keyboard),
                 ),
               ),
             ),
-              Expanded(
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                 },
-                    icon: Icon(Icons.replay),
-                    label: Text('Jugar de nuevo'),
-                    ),
-                  ),
+            //Play again
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: ElevatedButton.icon(
+                  onPressed: (reStart),
+                  icon: const Icon(Icons.replay),
+                  label: const Text('Jugar de nuevo'),
                 ),
+              ),
+            ),
           ],
         ),
       ),
@@ -168,10 +185,11 @@ class _MyHangManState extends State<MyHangMan> {
   }
 }
 
-//Need a place to keep track of incorrect guessed letters
-//Need a way to stop the game if finished with or without success:
-//give positive feedback on success and jugar de nuevo button
-//show word and end game with jugar de nuevo button if not success
+//Need a way to STOP the game if finished with or without success:
+//show word and end game if not success!!!
+//I can still guess letters after success!!! Stop that!
+//Maybe break, maybe boolean, stop??? Logic file?!
+
 //Additional requirements:
 //Add homescreen with gif??? BMI calculator section of Flutter Course
 //https://flutterawesome.com/bmi-calculator-using-flutter/:
