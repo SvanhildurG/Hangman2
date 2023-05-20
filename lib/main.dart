@@ -1,9 +1,46 @@
+//import 'dart:js';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 
 void main() {
   runApp(const MyApp());
+}
+
+class HomeScreen extends StatelessWidget {
+  const HomeScreen();
+
+  void startPlaying(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const MyHangMan(title: 'Ahorcado')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Ahorcado'),
+      ),
+      body: Center(
+        child: Image.asset(
+          'assets/gif/giphy.webp',
+          height: 300,
+          width: 150,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          //=> startPlaying(context),
+          Navigator.pushNamed(context, '/jugar');
+          //icon: const Icon(Icons.play_circle),
+          //label: const Text('Jugar'),
+        },
+        child: const Icon(Icons.play_arrow),
+      ),
+    );
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -17,7 +54,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.pink,
       ),
-      home: const MyHangMan(title: 'Ahorcado'),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomeScreen(),
+        '/jugar': (context) => const MyHangMan(title: 'Ahorcado'),
+      },
     );
   }
 }
@@ -44,6 +85,8 @@ class _MyHangManState extends State<MyHangMan> {
     'nube'
   ];
 
+  bool wordComplete = false;
+  bool gameOver = false;
   String randomWord = '';
   int _wrongGuesses = 0;
   List<String> underscore = [];
@@ -69,6 +112,8 @@ class _MyHangManState extends State<MyHangMan> {
 
 //Check if letter is to be found in word or not
   void checkLetter(String letter) {
+    if (gameOver) return;
+
     bool letterFound = false;
     setState(() {
       for (var i = 0; i < randomWord.length; i++) {
@@ -81,11 +126,23 @@ class _MyHangManState extends State<MyHangMan> {
         wrongGuesses();
         guessedLetters.add(letter); //Wrong letter to list
       }
+
+      //Check if word is complete
+      wordComplete = true;
+      for (var letter in underscore) {
+        if (letter == '_') {
+          wordComplete = false;
+          break;
+        }
+      }
+      //User finishes guesses
+      if (_wrongGuesses == images.length - 1) {
+        gameOver = true;
+      }
+
       _textController.clear();
     });
   }
-
-  //Stop game
 
   // Restart the game
   void reStart() {
@@ -94,6 +151,7 @@ class _MyHangManState extends State<MyHangMan> {
       randomWord = words.elementAt(Random().nextInt(words.length));
       underscore = List.generate(randomWord.length, (_) => '_');
       guessedLetters.clear();
+      wordComplete = false;
     });
   }
 
@@ -149,7 +207,7 @@ class _MyHangManState extends State<MyHangMan> {
             const SizedBox(height: 16),
             TextField(
               controller: _textController,
-              onSubmitted: checkLetter,
+              onSubmitted: wordComplete ? null : checkLetter,
               decoration: InputDecoration(
                 hintText: '¡Entra tu letra!',
                 hintStyle: const TextStyle(
@@ -172,7 +230,9 @@ class _MyHangManState extends State<MyHangMan> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: ElevatedButton.icon(
-                  onPressed: (reStart),
+                  onPressed: () {
+                    reStart();
+                  },
                   icon: const Icon(Icons.replay),
                   label: const Text('Jugar de nuevo'),
                 ),
@@ -184,18 +244,3 @@ class _MyHangManState extends State<MyHangMan> {
     );
   }
 }
-
-//Need a way to STOP the game if finished with or without success:
-//show word and end game if not success!!!
-//I can still guess letters after success!!! Stop that!
-//Maybe break, maybe boolean, stop??? Logic file?!
-
-//Additional requirements:
-//Add homescreen with gif??? BMI calculator section of Flutter Course
-//https://flutterawesome.com/bmi-calculator-using-flutter/:
-/*class InputPage extends StatefulWidget {
-  @override
-  _InputPageState createState() => _InputPageState();
-}
-*/
-//https://github.com/londonappbrewery/BMI-Calculator-Flutter-Completed/blob/master/lib/screens/input_page.dart
