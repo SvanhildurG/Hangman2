@@ -1,4 +1,3 @@
-//import 'dart:js';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -7,8 +6,9 @@ void main() {
   runApp(const MyApp());
 }
 
+//Homescreen
 class HomeScreen extends StatelessWidget {
-  const HomeScreen();
+  const HomeScreen({Key? key}) : super(key: key);
 
   void startPlaying(BuildContext context) {
     Navigator.push(
@@ -21,9 +21,10 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ahorcado'),
+        title: const Text('Ahorcado - Vocabulario del tiempo'),
       ),
       body: Center(
+        //gif for homescreen
         child: Image.asset(
           'assets/gif/giphy.webp',
           height: 300,
@@ -32,10 +33,7 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //=> startPlaying(context),
           Navigator.pushNamed(context, '/jugar');
-          //icon: const Icon(Icons.play_circle),
-          //label: const Text('Jugar'),
         },
         child: const Icon(Icons.play_arrow),
       ),
@@ -44,7 +42,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key); //from tic tac toe
+  const MyApp({Key? key}) : super(key: key);
 
   // Root of application.
   @override
@@ -52,7 +50,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Ahorcado',
       theme: ThemeData(
-        primarySwatch: Colors.pink,
+        primarySwatch: Colors.yellow,
       ),
       initialRoute: '/',
       routes: {
